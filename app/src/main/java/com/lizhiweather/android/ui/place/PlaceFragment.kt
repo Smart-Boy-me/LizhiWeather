@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.lizhiweather.android.MainActivity
 import com.lizhiweather.android.R
 import com.lizhiweather.android.ui.weather.WeatherActivity
 import kotlinx.android.synthetic.main.fragment_place.*
@@ -33,7 +35,7 @@ class PlaceFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if(viewModel.isPlaceSaved()){
+        if(activity is MainActivity && viewModel.isPlaceSaved()){
             val place = viewModel.getSavedPlace()
             val intent = Intent(context,WeatherActivity::class.java).apply {
                 putExtra("location_lng", place.location.lng)
@@ -68,7 +70,7 @@ class PlaceFragment : Fragment() {
                 viewModel.placeList.addAll(places)
                 adapter.notifyDataSetChanged()
             }else{
-                Snackbar.make(myView,"未查询到任何地点",Snackbar.LENGTH_SHORT).setAction("ok"){}.show()
+                Toast.makeText(context,"未查询到任何地点",Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
         }

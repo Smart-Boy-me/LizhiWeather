@@ -9,16 +9,24 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 object LizhiWeatherNetwork {
+
     private val placeService = ServiceCreator.create<PlaceService>()
+    suspend fun searchPlaces(query: String) = placeService.searchPlaces(query).await()
 
-    suspend fun searchPlaces(query:String) = placeService.searchPlaces(query).await()
+    private val weatherService = ServiceCreator.create<WeatherService>()
+    suspend fun getDailyWeather(lng: String, lat: String) =
+        weatherService.getDailyWeather(lng, lat).await()
 
-    private suspend fun <T> Call<T>.await() : T {
+    suspend fun getRealtimeWeather(lng: String, lat: String) =
+        weatherService.getRealtimeWeather(lng, lat).await()
+
+
+    private suspend fun <T> Call<T>.await(): T {
         return suspendCoroutine { continuation ->
-            enqueue(object : Callback<T>{
+            enqueue(object : Callback<T> {
                 override fun onResponse(call: Call<T>, response: Response<T>) {
                     val body = response.body()
-                    if(body != null)
+                    if (body != null)
                         continuation.resume(body)
                     else
                         continuation.resumeWithException(RuntimeException("Response body is null!"))
